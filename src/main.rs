@@ -8,7 +8,7 @@ async fn main() -> anyhow::Result<()> {
         .token("WzVTz8JZKRwD1H5iErKr1W10HeWfdsPV")
         .build()?;
 
-    if let Err(e) = client.create_note("test").await {
+    if let Err(e) = client.create_note("つかれた").await {
         println!("{:?}", e);
     }
 

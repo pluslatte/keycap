@@ -1,10 +1,21 @@
 import React from 'react';
 import './App.css';
 
+const onNoteButtonClicked = () => {
+  fetch("http://localhost:3030", {
+    method: "POST",
+  }).then((response) => {
+    if (!response.ok)
+      throw new Error("status is not 200");
+  });
+};
+
 function App() {
   return (
     <div className="App">
-      <button>note</button>
+      <button onClick={onNoteButtonClicked}>
+        ノート
+      </button>
     </div>
   );
 }

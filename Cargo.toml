@@ -4,6 +4,3 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-anyhow = "1.0.94"
-misskey = { version = "0.3.0-rc.1", features = ["12-75-0"] }
-tokio = { version = "1.42.0", features = ["full"] }

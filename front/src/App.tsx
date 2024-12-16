@@ -4,6 +4,9 @@ import './App.css';
 const onNoteButtonClicked = () => {
   fetch("http://localhost:3030", {
     method: "POST",
+    body: JSON.stringify({
+      text: "テスト"
+    }),
   }).then((response) => {
     if (!response.ok)
       throw new Error("status is not 200");

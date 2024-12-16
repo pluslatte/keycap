@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{collections::HashMap, str::FromStr};
 
 use serde_json::json;
 use warp::Filter;
@@ -8,16 +8,19 @@ async fn main() {
     // HEY! keep in mind that warp::path("hoge").and(warp::fs::dir("somewhere/something")) WON'T WORK!
     let front = warp::fs::dir("front/build");
 
-    let note = warp::post().and_then(|| async {
-        match create_note(String::from_str("ｶﾘｰﾝ").unwrap()).await {
-            Ok(_) => {}
-            Err(error) => {
-                println!("note creation failure: {}", error)
-            }
-        };
-        println!("note created");
-        Ok::<&str, warp::Rejection>("ok")
-    });
+    let note =
+        warp::post()
+            .and(warp::body::json())
+            .and_then(|body: HashMap<String, String>| async move {
+                match create_note(body.get("text").unwrap().to_string()).await {
+                    Ok(_) => {}
+                    Err(error) => {
+                        println!("note creation failure: {}", error)
+                    }
+                };
+                println!("note created");
+                Ok::<&str, warp::Rejection>("ok")
+            });
     warp::serve(warp::any().and(front.or(note)))
         .run(([127, 0, 0, 1], 3030))
         .await;

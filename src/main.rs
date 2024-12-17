@@ -140,7 +140,7 @@ async fn main() {
                     }
                 };
 
-                println!("invalid POST request")
+                println!("invalid POST request");
             }
             Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(Response::new(
                 "invalid".into(),

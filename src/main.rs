@@ -10,21 +10,20 @@ async fn main() {
     let front = warp::fs::dir("front/build");
 
     // Filter POST request from front-end
-    let post =
-        warp::post()
-            .and(warp::body::json())
-            .and_then(|body: HashMap<String, String>| async move {
-                println!("\ngot POST request with body");
-                if let (Some(server_domain), Some(token)) =
-                    (body.get("server_domain"), body.get("token"))
-                {
-                    println!("body of the request had `server_domain` and `token` in it");
-                    // Target server and access token
-                    let misskey_api = MisskeyApi::new(server_domain, token);
-                    println!("target server is {}, with token {}", server_domain, token);
+    let post = warp::post().and(warp::body::json()).and_then(
+        |body: HashMap<String, String>| async move {
+            println!("\ngot POST request with body");
+            if let (Some(server_domain), Some(token)) =
+                (body.get("server_domain"), body.get("token"))
+            {
+                println!("body of the request had `server_domain` and `token` in it");
+                // Target server and access token
+                let misskey_api = MisskeyApi::new(server_domain, token);
+                println!("target server is {}, with token {}", server_domain, token);
 
-                    // If request from front-end had "text" in its body
-                    if let Some(text) = body.get("text") {
+                // If request from front-end had "text" in its body
+                match body.get("text") {
+                    Some(text) => {
                         println!("body of the request had `text` in it");
                         println!("trying to create note with given text {}", text);
                         match misskey_api.create_note(text).await {
@@ -39,10 +38,15 @@ async fn main() {
                         return Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(
                             Response::new("ok".into()),
                         );
-                    };
+                    }
+                    None => {
+                        println!("body of the request does not have `text`");
+                    }
+                };
 
-                    // If request from front-end had "request_type" in its body
-                    if let Some(request_type) = body.get("request_type") {
+                // If request from front-end had "request_type" in its body
+                match body.get("request_type") {
+                    Some(request_type) => {
                         println!("body of the request had `request_type` in it");
                         // If "request_type" was "username"
                         if request_type == "username" {
@@ -71,14 +75,19 @@ async fn main() {
                             };
                         }
                         println!("invalid `request_type`: {}", request_type);
-                    };
+                    }
+                    None => {
+                        println!("body of the request does not have `request_type`");
+                    }
+                };
 
-                    println!("invalid POST request")
-                }
-                Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(Response::new(
-                    "invalid".into(),
-                ))
-            });
+                println!("invalid POST request")
+            }
+            Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(Response::new(
+                "invalid".into(),
+            ))
+        },
+    );
     warp::serve(warp::any().and(front.or(post)))
         .run(([127, 0, 0, 1], 3030))
         .await;

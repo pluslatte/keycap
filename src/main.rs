@@ -9,6 +9,7 @@ async fn main() {
     // HEY! keep in mind that warp::path("hoge").and(warp::fs::dir("somewhere/something")) WON'T WORK!
     let front = warp::fs::dir("front/build");
 
+    // Filter POST request from front-end
     let post =
         warp::post()
             .and(warp::body::json())
@@ -65,7 +66,6 @@ async fn main() {
                 Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(Response::new(
                     "nothing".into(),
                 ))
-                // Ok::<String, warp::Rejection>("nothing".to_string())
             });
     warp::serve(warp::any().and(front.or(post)))
         .run(([127, 0, 0, 1], 3030))

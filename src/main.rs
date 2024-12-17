@@ -26,27 +26,30 @@ async fn main() {
                             Response::new("ok".into()),
                         );
                     };
-                    if let Some(req_type) = body.get("req_type") {
-                        return match get_i(token).await {
-                            Ok(val) => {
-                                println!("fetched user's username");
-                                let name = val["name"]
-                                    .as_str()
-                                    .unwrap_or("Error: Username was empty")
-                                    .to_string();
-                                Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(
-                                    Response::new(name.into()),
-                                )
-                                // Ok::<String, warp::Rejection>()
-                            }
-                            Err(error) => {
-                                println!("could not get user's username");
-                                Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(
-                                    Response::new("Error: Could not get username: {}".into()),
-                                )
-                                // Ok(format!("Error: Could not get username: {}", error))
-                            }
-                        };
+                    if let Some(request_type) = body.get("request_type") {
+                        if request_type == "username" {
+                            return match get_i(token).await {
+                                Ok(val) => {
+                                    println!("fetched user's username");
+                                    let name = val["name"]
+                                        .as_str()
+                                        .unwrap_or("Error: Username was empty")
+                                        .to_string();
+                                    Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(
+                                        Response::new(name.into()),
+                                    )
+                                }
+                                Err(error) => {
+                                    println!("could not get user's username");
+                                    Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(
+                                        Response::new(
+                                            format!("Error: Could not get username: {}", error)
+                                                .into(),
+                                        ),
+                                    )
+                                }
+                            };
+                        }
                     };
                 }
                 Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(Response::new(

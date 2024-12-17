@@ -13,8 +13,12 @@ async fn main() {
             .and(warp::body::json())
             .and_then(|body: HashMap<String, String>| async move {
                 if let Some(token) = body.get("token") {
+                    // Target server and access token
+                    let server = MisskeyServer::new("virtualkemomimi.net", token);
+
+                    // If request from front-end had "text" in its body
                     if let Some(text) = body.get("text") {
-                        match create_note(text, token).await {
+                        match server.create_note(text).await {
                             Ok(_) => {
                                 println!("note created");
                             }
@@ -26,9 +30,12 @@ async fn main() {
                             Response::new("ok".into()),
                         );
                     };
+
+                    // If request from front-end had "request_type" in its body
                     if let Some(request_type) = body.get("request_type") {
+                        // If "request_type" was "username"
                         if request_type == "username" {
-                            return match get_i(token).await {
+                            return match server.get_i().await {
                                 Ok(val) => {
                                     println!("fetched user's username");
                                     let name = val["name"]
@@ -79,59 +86,60 @@ impl ApiEndpoint {
 }
 
 struct MisskeyServer {
-    url: String,
+    domain: String,
+    token: String,
 }
 
 impl MisskeyServer {
-    fn new(domain: &str) -> MisskeyServer {
+    fn new(domain: &str, token: &str) -> MisskeyServer {
         MisskeyServer {
-            url: format!("https://{}", domain),
+            domain: domain.to_string(),
+            token: token.to_string(),
         }
     }
 
     fn api_endpoint(&self) -> ApiEndpoint {
-        ApiEndpoint::new(&self.url)
+        ApiEndpoint::new(format!("https://{}", self.domain).as_str())
     }
-}
 
-async fn post_misskey_api(
-    name_endpoint: &str,
-    payload: Option<serde_json::Value>,
-) -> Result<serde_json::Value, String> {
-    let server_domain = "virtualkemomimi.net";
-    let server = MisskeyServer::new(server_domain);
-    let endpoint = server.api_endpoint();
+    async fn post_misskey_api(
+        &self,
+        name_endpoint: &str,
+        payload: Option<serde_json::Value>,
+    ) -> Result<serde_json::Value, String> {
+        let endpoint = self.api_endpoint();
 
-    let reqwest_client = reqwest::Client::new();
-    let request = reqwest_client.post(endpoint.url_of(name_endpoint));
-    let response = match payload {
-        Some(body) => request
-            .header("Content-Type", "application/json")
-            .json(&body),
-        None => request,
+        let reqwest_client = reqwest::Client::new();
+        let request = reqwest_client.post(endpoint.url_of(name_endpoint));
+        let response = match payload {
+            Some(body) => request
+                .header("Content-Type", "application/json")
+                .json(&body),
+            None => request,
+        }
+        .send()
+        .await
+        .map_err(|error| error.to_string())?
+        .json::<serde_json::Value>()
+        .await
+        .map_err(|error| error.to_string())?;
+
+        Ok(response)
     }
-    .send()
-    .await
-    .map_err(|error| error.to_string())?
-    .json::<serde_json::Value>()
-    .await
-    .map_err(|error| error.to_string())?;
 
-    Ok(response)
-}
+    async fn create_note(&self, text: &str) -> Result<serde_json::Value, String> {
+        let payload = json!({
+            "visivility": "public",
+            "text": text,
+            "i": self.token,
+        });
+        self.post_misskey_api("notes/create", Some(payload)).await
+    }
 
-async fn create_note(text: &str, token: &str) -> Result<serde_json::Value, String> {
-    let payload = json!({
-        "visivility": "public",
-        "text": text,
-        "i": token
-    });
-    post_misskey_api("notes/create", Some(payload)).await
-}
-
-async fn get_i(token: &str) -> Result<serde_json::Value, String> {
-    let payload = json!({
-        "i": token
-    });
-    post_misskey_api("i", Some(payload)).await
+    async fn get_i(&self) -> Result<serde_json::Value, String> {
+        let payload = json!({
+            "i": self.token
+        });
+        self.post_misskey_api("i", Some(payload)).await
+    }
 }

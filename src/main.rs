@@ -13,13 +13,15 @@ async fn main() {
         warp::post()
             .and(warp::body::json())
             .and_then(|body: HashMap<String, String>| async move {
-                if let Some(token) = body.get("token") {
+                if let (Some(server_domain), Some(token)) =
+                    (body.get("server_domain"), body.get("token"))
+                {
                     // Target server and access token
-                    let server = MisskeyApi::new("virtualkemomimi.net", token);
+                    let misskey_api = MisskeyApi::new(server_domain, token);
 
                     // If request from front-end had "text" in its body
                     if let Some(text) = body.get("text") {
-                        match server.create_note(text).await {
+                        match misskey_api.create_note(text).await {
                             Ok(_) => {
                                 println!("note created");
                             }
@@ -36,7 +38,7 @@ async fn main() {
                     if let Some(request_type) = body.get("request_type") {
                         // If "request_type" was "username"
                         if request_type == "username" {
-                            return match server.get_i().await {
+                            return match misskey_api.get_i().await {
                                 Ok(val) => {
                                     println!("fetched user's username");
                                     let name = val["name"]

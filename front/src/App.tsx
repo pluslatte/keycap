@@ -3,18 +3,24 @@ import './App.css';
 
 function App() {
   const [noteText, setNoteText] = useState<string>("");
+  const [serverDomain, setServerDomain] = useState<string>("");
   const [token, setToken] = useState<string>("");
   const [username, setUsername] = useState<string>("");
 
   const onNoteInputFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setNoteText(value);
-  }
+  };
+
+  const onServerDomainInputFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setServerDomain(value);
+  };
 
   const onTokenInputFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setToken(value);
-  }
+  };
 
   const onNoteButtonClicked = () => {
     fetch("http://localhost:3030", {
@@ -22,6 +28,7 @@ function App() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         text: noteText,
+        server_domain: serverDomain,
         token: token
       }),
     }).then((response) => {
@@ -42,6 +49,7 @@ function App() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         request_type: "username",
+        server_domain: serverDomain,
         token: token
       }),
     })
@@ -61,6 +69,13 @@ function App() {
       <h1>keycap</h1>
       <h2>settings</h2>
       <div>
+        <p>server domain</p>
+        <input
+          type="text"
+          value={serverDomain}
+          onChange={onServerDomainInputFieldChange}
+          placeholder="Misskey server domain"
+        />
         <p>token</p>
         <input
           type="text"

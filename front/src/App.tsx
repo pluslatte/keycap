@@ -1,13 +1,19 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import './App.css';
 
 function App() {
-  const [inputValue, setInputValue] = useState<string>("");
+  const [noteText, setNoteText] = useState<string>("");
+  const [token, setToken] = useState<string>("");
   const [username, setUsername] = useState<string>("");
 
-  const onInputFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onNoteInputFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    setInputValue(value);
+    setNoteText(value);
+  }
+
+  const onTokenInputFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setToken(value);
   }
 
   const onNoteButtonClicked = () => {
@@ -15,7 +21,8 @@ function App() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        text: inputValue
+        text: noteText,
+        token: token
       }),
     }).then((response) => {
       if (!response.ok) {
@@ -34,7 +41,8 @@ function App() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        req_type: "username"
+        req_type: "username",
+        token: token
       }),
     })
 
@@ -51,21 +59,34 @@ function App() {
   return (
     <div className="App">
       <h1>keycap</h1>
-      <p>{username}</p>
+      <h2>settings</h2>
       <div>
+        <p>token</p>
         <input
           type="text"
-          value={inputValue}
-          onChange={onInputFieldChange}
-          placeholder="Type something..."
+          value={token}
+          onChange={onTokenInputFieldChange}
+          placeholder="Your access token"
         />
       </div>
-      <button onClick={onNoteButtonClicked}>
-        ノート
-      </button>
-      <button onClick={onGetUserNameButtonClicked}>
-        get username
-      </button>
+      <h2>control</h2>
+      <div>
+        <p>{username}</p>
+        <div>
+          <input
+            type="text"
+            value={noteText}
+            onChange={onNoteInputFieldChange}
+            placeholder="Type something..."
+          />
+        </div>
+        <button onClick={onNoteButtonClicked}>
+          ノート
+        </button>
+        <button onClick={onGetUserNameButtonClicked}>
+          get username
+        </button>
+      </div>
     </div>
   );
 }

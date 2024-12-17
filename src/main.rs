@@ -12,42 +12,43 @@ async fn main() {
         warp::post()
             .and(warp::body::json())
             .and_then(|body: HashMap<String, String>| async move {
-                if let Some(text) = body.get("text") {
-                    match create_note(text.to_string()).await {
-                        Ok(_) => {
-                            println!("note created");
-                        }
-                        Err(error) => {
-                            println!("note creation failure: {}", error)
-                        }
+                if let Some(token) = body.get("token") {
+                    if let Some(text) = body.get("text") {
+                        match create_note(text, token).await {
+                            Ok(_) => {
+                                println!("note created");
+                            }
+                            Err(error) => {
+                                println!("note creation failure: {}", error)
+                            }
+                        };
+                        return Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(
+                            Response::new("ok".into()),
+                        );
                     };
-                    return Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(
-                        Response::new("ok".into()),
-                    );
-                    // return Ok::<String, warp::Rejection>("ok".to_string());
-                };
-                if let Some(req_type) = body.get("req_type") {
-                    return match get_i().await {
-                        Ok(val) => {
-                            println!("fetched user's username");
-                            let name = val["name"]
-                                .as_str()
-                                .unwrap_or("Error: Username was empty")
-                                .to_string();
-                            Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(
-                                Response::new(name.into()),
-                            )
-                            // Ok::<String, warp::Rejection>()
-                        }
-                        Err(error) => {
-                            println!("could not get user's username");
-                            Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(
-                                Response::new("Error: Could not get username: {}".into()),
-                            )
-                            // Ok(format!("Error: Could not get username: {}", error))
-                        }
+                    if let Some(req_type) = body.get("req_type") {
+                        return match get_i(token).await {
+                            Ok(val) => {
+                                println!("fetched user's username");
+                                let name = val["name"]
+                                    .as_str()
+                                    .unwrap_or("Error: Username was empty")
+                                    .to_string();
+                                Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(
+                                    Response::new(name.into()),
+                                )
+                                // Ok::<String, warp::Rejection>()
+                            }
+                            Err(error) => {
+                                println!("could not get user's username");
+                                Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(
+                                    Response::new("Error: Could not get username: {}".into()),
+                                )
+                                // Ok(format!("Error: Could not get username: {}", error))
+                            }
+                        };
                     };
-                };
+                }
                 Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(Response::new(
                     "nothing".into(),
                 ))
@@ -116,20 +117,18 @@ async fn post_misskey_api(
     Ok(response)
 }
 
-async fn create_note(text: String) -> Result<serde_json::Value, String> {
-    let token = "";
+async fn create_note(text: &str, token: &str) -> Result<serde_json::Value, String> {
     let payload = json!({
         "visivility": "public",
-        "text": &text,
-        "i": &token
+        "text": text,
+        "i": token
     });
     post_misskey_api("notes/create", Some(payload)).await
 }
 
-async fn get_i() -> Result<serde_json::Value, String> {
-    let token = "";
+async fn get_i(token: &str) -> Result<serde_json::Value, String> {
     let payload = json!({
-        "i": &token
+        "i": token
     });
     post_misskey_api("i", Some(payload)).await
 }

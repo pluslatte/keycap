@@ -86,7 +86,7 @@ function App() {
       </div>
       <h2>control</h2>
       <div>
-        <p>{username}</p>
+        <p>{username}@{serverDomain}</p>
         <div>
           <input
             type="text"

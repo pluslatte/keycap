@@ -1,7 +1,9 @@
 use std::collections::HashMap;
 
-use futures_util::{future, pin_mut, StreamExt};
+use futures_util::{future, pin_mut, SinkExt, StreamExt};
+use serde_json::json;
 use tokio::io::AsyncWriteExt;
+use tokio_tungstenite::tungstenite::Message;
 use warp::{reply::Response, Filter};
 
 use keycap::MisskeyApi;
@@ -93,21 +95,33 @@ async fn main() {
                                         .into(),
                                     ));
                                 }
-                                Ok((ws_stream, _)) => {
+                                Ok((mut ws_stream, _)) => {
                                     println!("ws connection established");
-                                    let (write, read) = ws_stream.split();
-
-                                    let ws_to_stdout = {
-                                        read.for_each(|message| async {
-                                            let data = message.unwrap().into_data();
-                                            tokio::io::stdout()
-                                                .write_all(&data.as_slice())
-                                                .await
-                                                .unwrap();
+                                    let request_msg = Message::text(
+                                        json!({
+                                            "type": "connect",
+                                            "body": {
+                                                "channel": "globalTimeline",
+                                                "id": "1"
+                                            }
                                         })
+                                        .to_string(),
+                                    );
+                                    match ws_stream.send(request_msg).await {
+                                        Ok(_) => {}
+                                        Err(error) => {
+                                            return Ok(Response::new(
+                                                "failed to send a resuest over the ws connection"
+                                                    .into(),
+                                            ))
+                                        }
                                     };
+                                    while let Some(Ok(response)) = ws_stream.next().await {
+                                        println!("{}", response);
+                                    }
+
                                     return Ok(Response::new(
-                                        "successfully terminated ws connection".into(),
+                                        "successfully finished ws operation".into(),
                                     ));
                                 }
                             }

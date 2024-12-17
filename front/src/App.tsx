@@ -67,23 +67,6 @@ function App() {
   return (
     <div className="App">
       <h1>keycap</h1>
-      <h2>settings</h2>
-      <div>
-        <p>server domain</p>
-        <input
-          type="text"
-          value={serverDomain}
-          onChange={onServerDomainInputFieldChange}
-          placeholder="Misskey server domain"
-        />
-        <p>token</p>
-        <input
-          type="text"
-          value={token}
-          onChange={onTokenInputFieldChange}
-          placeholder="Your access token"
-        />
-      </div>
       <h2>control</h2>
       <div>
         <p>{username}@{serverDomain}</p>
@@ -101,6 +84,23 @@ function App() {
         <button onClick={onGetUserNameButtonClicked}>
           get username
         </button>
+      </div>
+      <h2>settings</h2>
+      <div>
+        <p>server domain</p>
+        <input
+          type="text"
+          value={serverDomain}
+          onChange={onServerDomainInputFieldChange}
+          placeholder="Misskey server domain"
+        />
+        <p>token</p>
+        <input
+          type="text"
+          value={token}
+          onChange={onTokenInputFieldChange}
+          placeholder="Your access token"
+        />
       </div>
     </div>
   );

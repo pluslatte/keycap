@@ -76,7 +76,9 @@ async fn main() {
                                     )
                                 }
                             };
-                        } else if request_type == "websocket" {
+                        } 
+                        // Else if "request_type" was "websocket"
+                        else if request_type == "websocket" {
                             println!("`request_type` was `websocket`");
                             println!(
                                 "trying to establish websocket connection: {} with token {}",

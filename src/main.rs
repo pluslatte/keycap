@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use futures_util::{future, pin_mut, StreamExt};
+use tokio::io::AsyncWriteExt;
 use warp::{reply::Response, Filter};
 
 use keycap::MisskeyApi;
@@ -73,6 +75,42 @@ async fn main() {
                                     )
                                 }
                             };
+                        } else if request_type == "ws" {
+                            println!("`request_type` was `ws`");
+                            println!(
+                                "trying to establish ws connection: {} with token {}",
+                                server_domain, token
+                            );
+                            let ws_attempt = misskey_api.websocket_stream().await;
+                            match ws_attempt {
+                                Err(error) => {
+                                    println!("could not establish ws connection: {}", error);
+                                    return Ok(Response::new(
+                                        format!(
+                                            "Error: Could not establish ws connection: {}",
+                                            error
+                                        )
+                                        .into(),
+                                    ));
+                                }
+                                Ok((ws_stream, _)) => {
+                                    println!("ws connection established");
+                                    let (write, read) = ws_stream.split();
+
+                                    let ws_to_stdout = {
+                                        read.for_each(|message| async {
+                                            let data = message.unwrap().into_data();
+                                            tokio::io::stdout()
+                                                .write_all(&data.as_slice())
+                                                .await
+                                                .unwrap();
+                                        })
+                                    };
+                                    return Ok(Response::new(
+                                        "successfully terminated ws connection".into(),
+                                    ));
+                                }
+                            }
                         }
                         println!("invalid `request_type`: {}", request_type);
                     }

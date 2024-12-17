@@ -1,6 +1,12 @@
 use std::str::FromStr;
 
 use serde_json::json;
+use tokio::net::TcpStream;
+use tokio_tungstenite::{
+    connect_async,
+    tungstenite::{handshake::client::Response, Error},
+    MaybeTlsStream, WebSocketStream,
+};
 
 struct ApiEndpoint {
     server_url: String,
@@ -33,6 +39,13 @@ impl MisskeyApi {
 
     fn api_endpoint(&self) -> ApiEndpoint {
         ApiEndpoint::new(format!("https://{}", self.server_domain).as_str())
+    }
+
+    pub async fn websocket_stream(
+        &self,
+    ) -> Result<(WebSocketStream<MaybeTlsStream<TcpStream>>, Response), Error> {
+        let url = format!("wss://{}/streaming?i={}", self.server_domain, self.token);
+        connect_async(&url).await
     }
 
     async fn post_misskey_api(

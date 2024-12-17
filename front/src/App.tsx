@@ -43,6 +43,23 @@ function App() {
     await getUsersUserName();
   };
 
+  const onWsButtonClicked = async () => {
+    const response = await fetch("http://localhost:3030", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        request_type: "ws",
+        server_domain: serverDomain,
+        token: token
+      }),
+    })
+
+    if (!response.ok) {
+      console.error(response);
+      return;
+    }
+  }
+
   const getUsersUserName = async () => {
     const response = await fetch("http://localhost:3030", {
       method: "POST",
@@ -84,6 +101,7 @@ function App() {
         <button onClick={onGetUserNameButtonClicked}>
           get username
         </button>
+        <button onClick={onWsButtonClicked}>ws</button>
       </div>
       <h2>settings</h2>
       <div>
@@ -101,6 +119,10 @@ function App() {
           onChange={onTokenInputFieldChange}
           placeholder="Your access token"
         />
+      </div>
+      <h2>timeline</h2>
+      <div>
+
       </div>
     </div>
   );

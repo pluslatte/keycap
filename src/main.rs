@@ -1,8 +1,7 @@
 use std::collections::HashMap;
 
-use futures_util::{future, pin_mut, SinkExt, StreamExt};
+use futures_util::{SinkExt, StreamExt};
 use serde_json::json;
-use tokio::io::AsyncWriteExt;
 use tokio_tungstenite::tungstenite::Message;
 use warp::{reply::Response, Filter};
 
@@ -29,7 +28,7 @@ async fn main() {
                 match body.get("text") {
                     Some(text) => {
                         println!("body of the request had `text` in it");
-                        println!("trying to create note with given text {}", text);
+                        println!("trying to create an note with given text {}", text);
                         match misskey_api.create_note(text).await {
                             Ok(_) => {
                                 println!("note created: {}", text);
@@ -77,26 +76,28 @@ async fn main() {
                                     )
                                 }
                             };
-                        } else if request_type == "ws" {
-                            println!("`request_type` was `ws`");
+                        } else if request_type == "websocket" {
+                            println!("`request_type` was `websocket`");
                             println!(
-                                "trying to establish ws connection: {} with token {}",
+                                "trying to establish websocket connection: {} with token {}",
                                 server_domain, token
                             );
-                            let ws_attempt = misskey_api.websocket_stream().await;
-                            match ws_attempt {
+                            let websocket_attempt = misskey_api.websocket_stream().await;
+                            match websocket_attempt {
                                 Err(error) => {
-                                    println!("could not establish ws connection: {}", error);
+                                    println!("could not establish websocket connection: {}", error);
                                     return Ok(Response::new(
                                         format!(
-                                            "Error: Could not establish ws connection: {}",
+                                            "Error: Could not establish websocket connection: {}",
                                             error
                                         )
                                         .into(),
                                     ));
                                 }
-                                Ok((mut ws_stream, _)) => {
-                                    println!("ws connection established");
+                                Ok((mut websocket_stream, _)) => {
+                                    println!("websocket connection established");
+
+                                    println!("connecting to the globalTimeline");
                                     let request_msg = Message::text(
                                         json!({
                                             "type": "connect",
@@ -107,21 +108,25 @@ async fn main() {
                                         })
                                         .to_string(),
                                     );
-                                    match ws_stream.send(request_msg).await {
-                                        Ok(_) => {}
+                                    match websocket_stream.send(request_msg).await {
+                                        Ok(_) => {
+                                            println!("successfully connectted to the globalTimeLine");
+                                        }
                                         Err(error) => {
+                                            println!("could not connect to the globalTimeLine");
                                             return Ok(Response::new(
-                                                "failed to send a resuest over the ws connection"
-                                                    .into(),
+                                                format!("websocket request failure: connect to the globalTimeLine: {}", error).into(),
                                             ))
                                         }
                                     };
-                                    while let Some(Ok(response)) = ws_stream.next().await {
+                                    println!("start listening to the globalTimeLine...");
+                                    while let Some(Ok(response)) = websocket_stream.next().await {
+                                        println!("\nmessage from the globalTimeLine");
                                         println!("{}", response);
                                     }
 
                                     return Ok(Response::new(
-                                        "successfully finished ws operation".into(),
+                                        "successfully finished websocket operation".into(),
                                     ));
                                 }
                             }

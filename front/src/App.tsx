@@ -48,7 +48,7 @@ function App() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        request_type: "ws",
+        request_type: "websocket",
         server_domain: serverDomain,
         token: token
       }),

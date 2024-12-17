@@ -1,7 +1,7 @@
 use std::{collections::HashMap, str::FromStr};
 
 use serde_json::json;
-use warp::{filters::ext::get, reply::Response, Filter};
+use warp::{reply::Response, Filter};
 
 #[tokio::main]
 async fn main() {

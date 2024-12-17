@@ -14,7 +14,7 @@ async fn main() {
             .and_then(|body: HashMap<String, String>| async move {
                 if let Some(token) = body.get("token") {
                     // Target server and access token
-                    let server = MisskeyServer::new("virtualkemomimi.net", token);
+                    let server = MisskeyApi::new("virtualkemomimi.net", token);
 
                     // If request from front-end had "text" in its body
                     if let Some(text) = body.get("text") {
@@ -85,21 +85,21 @@ impl ApiEndpoint {
     }
 }
 
-struct MisskeyServer {
-    domain: String,
+struct MisskeyApi {
+    server_domain: String,
     token: String,
 }
 
-impl MisskeyServer {
-    fn new(domain: &str, token: &str) -> MisskeyServer {
-        MisskeyServer {
-            domain: domain.to_string(),
+impl MisskeyApi {
+    fn new(server_domain: &str, token: &str) -> MisskeyApi {
+        MisskeyApi {
+            server_domain: server_domain.to_string(),
             token: token.to_string(),
         }
     }
 
     fn api_endpoint(&self) -> ApiEndpoint {
-        ApiEndpoint::new(format!("https://{}", self.domain).as_str())
+        ApiEndpoint::new(format!("https://{}", self.server_domain).as_str())
     }
 
     async fn post_misskey_api(

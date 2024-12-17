@@ -1,27 +1,59 @@
 use std::{collections::HashMap, str::FromStr};
 
 use serde_json::json;
-use warp::Filter;
+use warp::{filters::ext::get, reply::Response, Filter};
 
 #[tokio::main]
 async fn main() {
     // HEY! keep in mind that warp::path("hoge").and(warp::fs::dir("somewhere/something")) WON'T WORK!
     let front = warp::fs::dir("front/build");
 
-    let note =
+    let post =
         warp::post()
             .and(warp::body::json())
             .and_then(|body: HashMap<String, String>| async move {
-                match create_note(body.get("text").unwrap().to_string()).await {
-                    Ok(_) => {}
-                    Err(error) => {
-                        println!("note creation failure: {}", error)
-                    }
+                if let Some(text) = body.get("text") {
+                    match create_note(text.to_string()).await {
+                        Ok(_) => {
+                            println!("note created");
+                        }
+                        Err(error) => {
+                            println!("note creation failure: {}", error)
+                        }
+                    };
+                    return Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(
+                        Response::new("ok".into()),
+                    );
+                    // return Ok::<String, warp::Rejection>("ok".to_string());
                 };
-                println!("note created");
-                Ok::<&str, warp::Rejection>("ok")
+                if let Some(req_type) = body.get("req_type") {
+                    return match get_i().await {
+                        Ok(val) => {
+                            println!("fetched user's username");
+                            let name = val["name"]
+                                .as_str()
+                                .unwrap_or("Error: Username was empty")
+                                .to_string();
+                            Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(
+                                Response::new(name.into()),
+                            )
+                            // Ok::<String, warp::Rejection>()
+                        }
+                        Err(error) => {
+                            println!("could not get user's username");
+                            Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(
+                                Response::new("Error: Could not get username: {}".into()),
+                            )
+                            // Ok(format!("Error: Could not get username: {}", error))
+                        }
+                    };
+                };
+                Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(Response::new(
+                    "nothing".into(),
+                ))
+                // Ok::<String, warp::Rejection>("nothing".to_string())
             });
-    warp::serve(warp::any().and(front.or(note)))
+    warp::serve(warp::any().and(front.or(post)))
         .run(([127, 0, 0, 1], 3030))
         .await;
 }
@@ -92,4 +124,12 @@ async fn create_note(text: String) -> Result<serde_json::Value, String> {
         "i": &token
     });
     post_misskey_api("notes/create", Some(payload)).await
+}
+
+async fn get_i() -> Result<serde_json::Value, String> {
+    let token = "";
+    let payload = json!({
+        "i": &token
+    });
+    post_misskey_api("i", Some(payload)).await
 }

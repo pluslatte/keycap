@@ -10,6 +10,7 @@ function App() {
   const [notes, setNotes] = useState<Note[]>();
   const [timelineType, setTimelineType] = useState<string>("");
   const [intervalTimer, setIntervalTimer] = useState<NodeJS.Timer>();
+  const [isAutoReload, setIsAutoReload] = useState<boolean>(false);
 
   const onNoteInputFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -110,8 +111,9 @@ function App() {
   };
 
   useEffect(() => {
+    if (intervalTimer != null) clearInterval(intervalTimer);
+    if (!isAutoReload) return;
     if (timelineType !== "") {
-      if (intervalTimer != null) clearInterval(intervalTimer);
       setIntervalTimer(setInterval(() => {
         if (timelineType === "HOME") {
           onGetHomeTimelineClicked();
@@ -124,7 +126,7 @@ function App() {
         }
       }, 5000));
     }
-  }, [timelineType]);
+  }, [timelineType, isAutoReload]);
 
   return (
     <div className="App">
@@ -167,6 +169,11 @@ function App() {
         />
       </div>
       <h2>timeline: {timelineType}</h2>
+      <label>
+        <input type="checkbox" name="autoReload" onChange={(event) => {
+          setIsAutoReload(event.target.checked);
+        }} />Auto Reload
+      </label>
       <div>
         <button onClick={onGetHomeTimelineClicked}>get HOME timeline</button>
         <button onClick={onGetLocalTimelineClicked}>get LOCAL timeline</button>

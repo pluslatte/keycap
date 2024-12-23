@@ -172,7 +172,7 @@ function App() {
       <label>
         <input type="checkbox" name="autoReload" onChange={(event) => {
           setIsAutoReload(event.target.checked);
-        }} />Auto Reload
+        }} />{"Auto reload (5s)"}
       </label>
       <div>
         <button onClick={onGetHomeTimelineClicked}>get HOME timeline</button>

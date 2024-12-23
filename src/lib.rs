@@ -88,4 +88,39 @@ impl MisskeyApi {
         });
         self.post_misskey_api("i", Some(payload)).await
     }
+
+    pub async fn get_timeline_home(&self) -> Result<serde_json::Value, String> {
+        let payload = json!({
+            "limit": 10,
+            "i": self.token
+        });
+        self.post_misskey_api("notes/timeline", Some(payload)).await
+    }
+
+    pub async fn get_timeline_local(&self) -> Result<serde_json::Value, String> {
+        let payload = json!({
+            "limit": 10,
+            "i": self.token
+        });
+        self.post_misskey_api("notes/local-timeline", Some(payload))
+            .await
+    }
+
+    pub async fn get_timeline_social(&self) -> Result<serde_json::Value, String> {
+        let payload = json!({
+            "limit": 10,
+            "i": self.token
+        });
+        self.post_misskey_api("notes/hybrid-timeline", Some(payload))
+            .await
+    }
+
+    pub async fn get_timeline_global(&self) -> Result<serde_json::Value, String> {
+        let payload = json!({
+            "limit": 10,
+            "i": self.token
+        });
+        self.post_misskey_api("notes/global-timeline", Some(payload))
+            .await
+    }
 }

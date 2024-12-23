@@ -53,7 +53,7 @@ async fn main() {
                         println!("body of the request had `request_type` in it");
                         // If "request_type" was "username"
                         if request_type == "username" {
-                            println!("`request_type` was `username`");
+                            println!("`request_type` was `{}`", request_type);
                             println!("trying to get user's username");
                             return match misskey_api.get_i().await {
                                 Ok(val) => {
@@ -76,62 +76,53 @@ async fn main() {
                                     )
                                 }
                             };
-                        } 
-                        // Else if "request_type" was "websocket"
-                        else if request_type == "websocket" {
-                            println!("`request_type` was `websocket`");
-                            println!(
-                                "trying to establish websocket connection: {} with token {}",
-                                server_domain, token
-                            );
-                            let websocket_attempt = misskey_api.websocket_stream().await;
-                            match websocket_attempt {
+                        }
+                        // Else if "request_type" was "timelineHome"
+                        else if request_type == "timelineHome"
+                            || request_type == "timelineLocal"
+                            || request_type == "timelineSocial"
+                            || request_type == "timelineGlobal"
+                        {
+                            println!("`request_type` was `{}`", request_type);
+                            let timeline_opt = match request_type.as_str() {
+                                "timelineHome" => {
+                                    println!("trying to get HOME timeline");
+                                    misskey_api.get_timeline_home().await
+                                }
+                                "timelineLocal" => {
+                                    println!("trying to get LOCAL timeline");
+                                    misskey_api.get_timeline_local().await
+                                }
+                                "timelineSocial" => {
+                                    println!("trying to get SOCIAL timeline");
+                                    misskey_api.get_timeline_social().await
+                                }
+                                "timelineGlobal" => {
+                                    println!("trying to get GLOBAL timeline");
+                                    misskey_api.get_timeline_global().await
+                                }
+                                _ => unreachable!(),
+                            };
+                            return match timeline_opt {
+                                Ok(val) => {
+                                    println!("got: {}", val);
+                                    Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(
+                                        Response::new("ok".into()),
+                                    )
+                                }
                                 Err(error) => {
-                                    println!("could not establish websocket connection: {}", error);
-                                    return Ok(Response::new(
-                                        format!(
-                                            "Error: Could not establish websocket connection: {}",
-                                            error
-                                        )
-                                        .into(),
-                                    ));
+                                    println!("could not get home timeline");
+                                    Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(
+                                        Response::new(
+                                            format!(
+                                                "Error: Could not get home timeline: {}",
+                                                error
+                                            )
+                                            .into(),
+                                        ),
+                                    )
                                 }
-                                Ok((mut websocket_stream, _)) => {
-                                    println!("websocket connection established");
-
-                                    println!("connecting to the globalTimeline");
-                                    let request_msg = Message::text(
-                                        json!({
-                                            "type": "connect",
-                                            "body": {
-                                                "channel": "globalTimeline",
-                                                "id": "1"
-                                            }
-                                        })
-                                        .to_string(),
-                                    );
-                                    match websocket_stream.send(request_msg).await {
-                                        Ok(_) => {
-                                            println!("successfully connectted to the globalTimeLine");
-                                        }
-                                        Err(error) => {
-                                            println!("could not connect to the globalTimeLine");
-                                            return Ok(Response::new(
-                                                format!("websocket request failure: connect to the globalTimeLine: {}", error).into(),
-                                            ))
-                                        }
-                                    };
-                                    println!("start listening to the globalTimeLine...");
-                                    while let Some(Ok(response)) = websocket_stream.next().await {
-                                        println!("\nmessage from the globalTimeLine");
-                                        println!("{}", response);
-                                    }
-
-                                    return Ok(Response::new(
-                                        "successfully finished websocket operation".into(),
-                                    ));
-                                }
-                            }
+                            };
                         }
                         println!("invalid `request_type`: {}", request_type);
                     }

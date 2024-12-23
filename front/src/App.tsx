@@ -8,6 +8,7 @@ function App() {
   const [token, setToken] = useState<string>("");
   const [username, setUsername] = useState<string>("");
   const [notes, setNotes] = useState<Note[]>();
+  const [timelineType, setTimelineType] = useState<string>("");
 
   const onNoteInputFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -68,18 +69,22 @@ function App() {
 
   const onGetHomeTimelineClicked = async () => {
     await getTimeline("timelineHome")
+    setTimelineType("HOME");
   };
 
   const onGetLocalTimelineClicked = async () => {
     await getTimeline("timelineLocal")
+    setTimelineType("LOCAL");
   };
 
   const onGetSocialTimelineClicked = async () => {
     await getTimeline("timelineSocial")
+    setTimelineType("SOCIAL");
   };
 
   const onGetGlobalTimelineClicked = async () => {
     await getTimeline("timelineGlobal")
+    setTimelineType("GLOBAL");
   };
 
   const getUsersUserName = async () => {
@@ -143,7 +148,7 @@ function App() {
           placeholder="Your access token"
         />
       </div>
-      <h2>timeline</h2>
+      <h2>timeline: {timelineType}</h2>
       <div>
         <button onClick={onGetHomeTimelineClicked}>get HOME timeline</button>
         <button onClick={onGetLocalTimelineClicked}>get LOCAL timeline</button>

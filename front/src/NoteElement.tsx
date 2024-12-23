@@ -27,7 +27,7 @@ export default function NoteElement(note: Note) {
 
     return (
         <div className="Note">
-            <h3>{note?.user.username}{note?.user.host ? "@" + note?.user.host : ""}</h3>
+            <h3>{`${note?.user.name} : ${note?.user.username}`}{note?.user.host ? "@" + note?.user.host : ""}</h3>
             {note?.text ? <p>{note?.text}</p> : null}
             {note?.renote ? ReNoteElement(note?.renote) : null}
         </div>

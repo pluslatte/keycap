@@ -131,6 +131,7 @@ function App() {
   return (
     <div className="App">
       <h1>keycap</h1>
+      <a href="https://github.com/pluslatte/keycap">GitHub Repository</a>
       <h2>control</h2>
       <div>
         <p>{username}@{serverDomain}</p>

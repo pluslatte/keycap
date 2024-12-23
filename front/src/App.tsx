@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import NoteElement, { Note } from "./NoteElement";
 
@@ -9,6 +9,7 @@ function App() {
   const [username, setUsername] = useState<string>("");
   const [notes, setNotes] = useState<Note[]>();
   const [timelineType, setTimelineType] = useState<string>("");
+  const [intervalTimer, setIntervalTimer] = useState<NodeJS.Timer>();
 
   const onNoteInputFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -107,6 +108,23 @@ function App() {
 
     setUsername(username);
   };
+
+  useEffect(() => {
+    if (timelineType !== "") {
+      if (intervalTimer != null) clearInterval(intervalTimer);
+      setIntervalTimer(setInterval(() => {
+        if (timelineType === "HOME") {
+          onGetHomeTimelineClicked();
+        } else if (timelineType === "LOCAL") {
+          onGetLocalTimelineClicked();
+        } else if (timelineType === "SOCIAL") {
+          onGetSocialTimelineClicked();
+        } else if (timelineType === "GLOBAL") {
+          onGetGlobalTimelineClicked();
+        }
+      }, 5000));
+    }
+  }, [timelineType]);
 
   return (
     <div className="App">

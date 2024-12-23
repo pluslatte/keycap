@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import './App.css';
+import NoteElement, { Note } from "./NoteElement";
 
 function App() {
   const [noteText, setNoteText] = useState<string>("");
   const [serverDomain, setServerDomain] = useState<string>("");
   const [token, setToken] = useState<string>("");
   const [username, setUsername] = useState<string>("");
+  const [notes, setNotes] = useState<Note[]>();
 
   const onNoteInputFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -58,6 +60,9 @@ function App() {
       console.error(response);
       return;
     }
+
+    const notes: Note[] = await response.json();
+    setNotes(notes);
   };
 
   const onGetHomeTimelineClicked = async () => {
@@ -141,6 +146,8 @@ function App() {
         <button onClick={onGetLocalTimelineClicked}>get LOCAL timeline</button>
         <button onClick={onGetSocialTimelineClicked}>get SOCIAL timeline</button>
         <button onClick={onGetGlobalTimelineClicked}>get GLOBAL timeline</button>
+        <p />
+        {notes?.map((note) => NoteElement(note))}
       </div>
     </div>
   );

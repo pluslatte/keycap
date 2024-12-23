@@ -3,7 +3,10 @@ use std::collections::HashMap;
 use futures_util::{SinkExt, StreamExt};
 use serde_json::json;
 use tokio_tungstenite::tungstenite::Message;
-use warp::{reply::Response, Filter};
+use warp::{
+    reply::{Reply, Response},
+    Filter,
+};
 
 use keycap::MisskeyApi;
 
@@ -106,9 +109,7 @@ async fn main() {
                             return match timeline_opt {
                                 Ok(val) => {
                                     println!("got: {}", val);
-                                    Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(
-                                        Response::new("ok".into()),
-                                    )
+                                    Ok(Response::new(val.to_string().into()))
                                 }
                                 Err(error) => {
                                     println!("could not get home timeline");

@@ -39,6 +39,7 @@ function App() {
         throw new Error("status is not 200");
       }
     });
+    setNoteText("");
   };
 
   const onGetUserNameButtonClicked = async () => {

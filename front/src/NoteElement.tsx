@@ -1,4 +1,4 @@
-import { useState } from "react";
+import ReNoteElement from "./ReNoteElement";
 
 export type User = {
     id: string,
@@ -16,6 +16,7 @@ export type Note = {
     createdAt: string,
     text: string | null,
     cw: string | null,
+    renote: Note | null,
     user: User,
     userId: string,
     visibility: string,
@@ -28,6 +29,7 @@ export default function NoteElement(note: Note) {
         <div className="Note">
             <h3>{note?.user.username}{note?.user.host ? "@" + note?.user.host : ""}</h3>
             {note?.text ? <p>{note?.text}</p> : null}
+            {note?.renote ? ReNoteElement(note?.renote) : null}
         </div>
     );
 }

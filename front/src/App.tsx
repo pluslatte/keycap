@@ -129,13 +129,15 @@ function App() {
         <p>server domain</p>
         <input
           type="text"
+          name="username"
           value={serverDomain}
           onChange={onServerDomainInputFieldChange}
           placeholder="Misskey server domain"
         />
         <p>token</p>
         <input
-          type="text"
+          type="password"
+          name="password"
           value={token}
           onChange={onTokenInputFieldChange}
           placeholder="Your access token"

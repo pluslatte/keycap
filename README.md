@@ -8,14 +8,14 @@ Misskeyサーバーにブラウザから繋ぎに行くとデフォルトで提�
 
 ## 動かし方
 - `git clone これ`
-- `cd keycap`
+- `cd keycap`  
 してから、
 - `cd front`
-- `REACT_APP_TARGET_BACKEND_DOMAIN=外から見たこのサーバーのドメイン yarn build`
+- `REACT_APP_TARGET_BACKEND_DOMAIN=外から見たこのサーバーのドメイン yarn build`  
 で配信するクライアントをビルド（クライアントは現状、実行するディレクトリからの相対パスで `front/build` に置かれている必要があります、改良する予定）
 - `cd ../`
-- `cargo run -p 好きなポート番号`
-でサーバーを希望
+- `cargo run -p 好きなポート番号`  
+でサーバーを起動
 - `http://設定したドメインとポート番号` をブラウザで開く
 - 必要な権限を含んだトークンと、 Misskey サーバーのホスト名を入力
 - ノートを送ったり、ユーザー名を取得したり、タイムラインを取得したりできます

@@ -1,11 +1,25 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, net::SocketAddrV4};
 
+use clap::{builder::RangedU64ValueParser, Arg, Command};
+use ever::ever;
 use warp::{reply::Response, Filter};
 
 use keycap::MisskeyApi;
 
 #[tokio::main]
 async fn main() {
+    ever!();
+    let matches = Command::new("keycap")
+        .version(ever::build_commit_hash!())
+        .about("Server program which provides an alternative, light-weight web client for Misskey.")
+        .arg(
+            Arg::new("port")
+                .short('p')
+                .long("port")
+                .help("http port to listen on")
+                .value_parser(RangedU64ValueParser::<u64>::new().range(1..=65535)),
+        )
+        .get_matches();
     // HEY! keep in mind that warp::path("hoge").and(warp::fs::dir("somewhere/something")) WON'T WORK!
     let front = warp::fs::dir("front/build");
 
@@ -133,7 +147,15 @@ async fn main() {
             ))
         },
     );
+
+    let port_to_listen_opt: Option<&u64> = matches.get_one("port");
+    let port_to_listen = match port_to_listen_opt {
+        Some(port) => *port,
+        None => 3030,
+    };
+    let socket_address =
+        SocketAddrV4::new([127, 0, 0, 1].into(), port_to_listen.try_into().unwrap());
     warp::serve(warp::any().and(front.or(post)))
-        .run(([127, 0, 0, 1], 3030))
+        .run(socket_address)
         .await;
 }

@@ -3,6 +3,10 @@ import './App.css';
 import NoteElement, { Note } from "./NoteElement";
 
 function App() {
+  const targetBackendDomain = process.env.REACT_APP_TARGET_BACKEND_DOMAIN;
+  const useHttps = process.env.REACT_APP_USE_HTTPS === "true";
+  const targetBackendAddress = useHttps ? `https://${targetBackendDomain}` : `http://${targetBackendDomain}`;
+
   const [noteText, setNoteText] = useState<string>("");
   const [serverDomain, setServerDomain] = useState<string>("");
   const [token, setToken] = useState<string>("");
@@ -28,7 +32,7 @@ function App() {
   };
 
   const onNoteButtonClicked = () => {
-    fetch("http://localhost:3030", {
+    fetch(targetBackendAddress, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -50,7 +54,7 @@ function App() {
   };
 
   const getTimeline = async (request_type_str: string) => {
-    const response = await fetch("http://localhost:3030", {
+    const response = await fetch(targetBackendAddress, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -90,7 +94,7 @@ function App() {
   };
 
   const getUsersUserName = async () => {
-    const response = await fetch("http://localhost:3030", {
+    const response = await fetch(targetBackendAddress, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -128,63 +132,73 @@ function App() {
     }
   }, [timelineType, isAutoReload]);
 
-  return (
-    <div className="App">
-      <h1>keycap</h1>
-      <a href="https://github.com/pluslatte/keycap">GitHub Repository</a>
-      <h2>control</h2>
-      <div>
-        <p>{username}@{serverDomain}</p>
+  if (targetBackendDomain == null) {
+    return (
+      <div className="App">
+        <h1>keycap</h1>
+        <p>REACT_APP_TARGET_BACKEND_DOMAIN is not set!</p>
+        <p>REACT_APP_TARGET_BACKEND_DOMAIN must be passed to yarn when you build this client</p>
+      </div>
+    )
+  } else {
+    return (
+      <div className="App">
+        <h1>keycap</h1>
+        <a href="https://github.com/pluslatte/keycap">GitHub Repository</a>
+        <h2>control</h2>
         <div>
+          <p>{username}@{serverDomain}</p>
+          <div>
+            <input
+              type="text"
+              value={noteText}
+              onChange={onNoteInputFieldChange}
+              placeholder="Type something..."
+            />
+          </div>
+          <button onClick={onNoteButtonClicked}>
+            ノート
+          </button>
+          <button onClick={onGetUserNameButtonClicked}>
+            get username
+          </button>
+        </div>
+        <h2>settings</h2>
+        <div>
+          <p>server domain</p>
           <input
             type="text"
-            value={noteText}
-            onChange={onNoteInputFieldChange}
-            placeholder="Type something..."
+            name="username"
+            value={serverDomain}
+            onChange={onServerDomainInputFieldChange}
+            placeholder="Misskey server domain"
+          />
+          <p>token</p>
+          <input
+            type="password"
+            name="password"
+            value={token}
+            onChange={onTokenInputFieldChange}
+            placeholder="Your access token"
           />
         </div>
-        <button onClick={onNoteButtonClicked}>
-          ノート
-        </button>
-        <button onClick={onGetUserNameButtonClicked}>
-          get username
-        </button>
+        <h2>timeline: {timelineType}</h2>
+        <label>
+          <input type="checkbox" name="autoReload" onChange={(event) => {
+            setIsAutoReload(event.target.checked);
+          }} />{"Auto reload (5s)"}
+        </label>
+        <div>
+          <button onClick={onGetHomeTimelineClicked}>get HOME timeline</button>
+          <button onClick={onGetLocalTimelineClicked}>get LOCAL timeline</button>
+          <button onClick={onGetSocialTimelineClicked}>get SOCIAL timeline</button>
+          <button onClick={onGetGlobalTimelineClicked}>get GLOBAL timeline</button>
+          <p />
+          {notes?.map((note) => NoteElement(note))}
+        </div>
       </div>
-      <h2>settings</h2>
-      <div>
-        <p>server domain</p>
-        <input
-          type="text"
-          name="username"
-          value={serverDomain}
-          onChange={onServerDomainInputFieldChange}
-          placeholder="Misskey server domain"
-        />
-        <p>token</p>
-        <input
-          type="password"
-          name="password"
-          value={token}
-          onChange={onTokenInputFieldChange}
-          placeholder="Your access token"
-        />
-      </div>
-      <h2>timeline: {timelineType}</h2>
-      <label>
-        <input type="checkbox" name="autoReload" onChange={(event) => {
-          setIsAutoReload(event.target.checked);
-        }} />{"Auto reload (5s)"}
-      </label>
-      <div>
-        <button onClick={onGetHomeTimelineClicked}>get HOME timeline</button>
-        <button onClick={onGetLocalTimelineClicked}>get LOCAL timeline</button>
-        <button onClick={onGetSocialTimelineClicked}>get SOCIAL timeline</button>
-        <button onClick={onGetGlobalTimelineClicked}>get GLOBAL timeline</button>
-        <p />
-        {notes?.map((note) => NoteElement(note))}
-      </div>
-    </div>
-  );
+    );
+  }
 }
 
 export default App;

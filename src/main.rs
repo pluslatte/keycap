@@ -27,6 +27,16 @@ async fn main() {
     let post = warp::post().and(warp::body::json()).and_then(
         |body: HashMap<String, String>| async move {
             println!("\ngot POST request with body");
+            if let Some(request_type) = body.get("request_type") {
+                println!("body of the request had `request_type` in it");
+                println!("`request_type` was `{}`", request_type);
+                if request_type == "version" {
+                    println!("`request_type` was `{}`", request_type);
+                    return Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(
+                        Response::new(ever::build_commit_hash!().into()),
+                    );
+                }
+            }
             if let (Some(server_domain), Some(token)) =
                 (body.get("server_domain"), body.get("token"))
             {

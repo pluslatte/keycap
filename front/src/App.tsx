@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import './App.css';
 import NoteElement, { Note } from "./NoteElement";
+import { Loadable } from "./LoadableState";
 
 function App() {
   const targetBackendAddress = "/";
@@ -13,6 +14,34 @@ function App() {
   const [timelineType, setTimelineType] = useState<string>("");
   const [intervalTimer, setIntervalTimer] = useState<NodeJS.Timer>();
   const [isAutoReload, setIsAutoReload] = useState<boolean>(false);
+
+  const VersionDataLoader: React.FC<{
+    data: Loadable<string>;
+  }> = ({ data }) => {
+    const value = data.getOrThrow();
+    return (
+      <div>
+        <p>
+          Version: {value}
+        </p>
+      </div>
+    );
+  };
+  const fetchVersion = async () =>
+    fetch(targetBackendAddress, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        request_type: "version"
+      }),
+    }).then((response) => {
+      if (!response.ok) {
+        console.error(response);
+        throw new Error("status is not 200");
+      }
+      return response.text();
+    });
+  const [versionData] = useState(() => new Loadable(fetchVersion()));
 
   const onNoteInputFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -134,6 +163,9 @@ function App() {
     <div className="App">
       <h1>keycap</h1>
       <a href="https://github.com/pluslatte/keycap">GitHub Repository</a>
+      <Suspense fallback={<div>Fetching version...</div>}>
+        <VersionDataLoader data={versionData} />
+      </Suspense>
       <h2>control</h2>
       <div>
         <p>{username}@{serverDomain}</p>

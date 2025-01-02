@@ -9,7 +9,6 @@ Misskeyサーバーにブラウザから繋ぎに行くとデフォルトで提�
 ## 必要なもの
 - [rustup](https://www.rust-lang.org/tools/install) with standard installation.
 - [volta](https://volta.sh/)
-- Existence of `/bin/bash`.
 
 ## 動かし方
 - `git clone これ`

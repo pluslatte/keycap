@@ -165,7 +165,5 @@ async fn main() {
     };
     let socket_address =
         SocketAddrV4::new([127, 0, 0, 1].into(), port_to_listen.try_into().unwrap());
-    warp::serve(warp::any().and(front.or(post)))
-        .run(socket_address)
-        .await;
+    warp::serve(front.or(post)).run(socket_address).await;
 }

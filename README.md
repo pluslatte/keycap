@@ -6,6 +6,11 @@ Misskeyサーバーにブラウザから繋ぎに行くとデフォルトで提�
 軽量な代替クライアントが欲しい（misskey-cliがあるのは知っています）が、iOS用アプリの開発環境を用意するのは嫌だ  
 ブラウザ上で動作する、最低限の機能をもったクライアントを配信するサーバーを作り、どこかでこれを稼働させることでどうにかしたい
 
+## 必要なもの
+- [rustup](https://www.rust-lang.org/tools/install) with standard installation.
+- [volta](https://volta.sh/)
+- Existence of `/bin/bash`.
+
 ## 動かし方
 - `git clone これ`
 - `cd keycap`  

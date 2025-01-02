@@ -11,7 +11,7 @@ Misskeyサーバーにブラウザから繋ぎに行くとデフォルトで提�
 - `cd keycap`  
 してから、
 - `cd front`
-- `yarn build`  
+- `volta run yarn build`  
 で配信するクライアントをビルド（クライアントは現状、実行するディレクトリからの相対パスで `front/build` に置かれている必要があります、改良する予定）
 - `cd ../`
 - `cargo run -p 好きなポート番号`  

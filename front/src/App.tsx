@@ -4,8 +4,6 @@ import NoteElement, { Note } from "./NoteElement";
 import { Loadable } from "./LoadableState";
 
 function App() {
-  const targetBackendAddress = "/";
-
   const [noteText, setNoteText] = useState<string>("");
   const [serverDomain, setServerDomain] = useState<string>("");
   const [token, setToken] = useState<string>("");
@@ -28,12 +26,9 @@ function App() {
     );
   };
   const fetchVersion = async () =>
-    fetch(targetBackendAddress, {
+    fetch("/api/version", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        request_type: "version"
-      }),
     }).then((response) => {
       if (!response.ok) {
         console.error(response);
@@ -59,7 +54,7 @@ function App() {
   };
 
   const onNoteButtonClicked = () => {
-    fetch(targetBackendAddress, {
+    fetch("/api/create_note", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -81,11 +76,10 @@ function App() {
   };
 
   const getTimeline = async (request_type_str: string) => {
-    const response = await fetch(targetBackendAddress, {
+    const response = await fetch("/api/" + request_type_str, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        request_type: request_type_str,
         server_domain: serverDomain,
         token: token
       }),
@@ -101,31 +95,30 @@ function App() {
   };
 
   const onGetHomeTimelineClicked = async () => {
-    await getTimeline("timelineHome")
+    await getTimeline("timeline_home")
     setTimelineType("HOME");
   };
 
   const onGetLocalTimelineClicked = async () => {
-    await getTimeline("timelineLocal")
+    await getTimeline("timeline_local")
     setTimelineType("LOCAL");
   };
 
   const onGetSocialTimelineClicked = async () => {
-    await getTimeline("timelineSocial")
+    await getTimeline("timeline_social")
     setTimelineType("SOCIAL");
   };
 
   const onGetGlobalTimelineClicked = async () => {
-    await getTimeline("timelineGlobal")
+    await getTimeline("timeline_global")
     setTimelineType("GLOBAL");
   };
 
   const getUsersUserName = async () => {
-    const response = await fetch(targetBackendAddress, {
+    const response = await fetch("/api/username", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        request_type: "username",
         server_domain: serverDomain,
         token: token
       }),

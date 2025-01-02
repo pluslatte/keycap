@@ -219,7 +219,6 @@ async fn main() {
         Some(port) => *port,
         None => 3030,
     };
-    let socket_address =
-        SocketAddrV4::new([127, 0, 0, 1].into(), port_to_listen.try_into().unwrap());
+    let socket_address = SocketAddrV4::new([0, 0, 0, 0].into(), port_to_listen.try_into().unwrap());
     warp::serve(front.or(api)).run(socket_address).await;
 }

@@ -1,5 +1,5 @@
-#!/bin/bash
-set -euxo pipefail
+#!/bin/sh
+set -eux
 cd "$(dirname "$0")"
 cd front
 volta run yarn

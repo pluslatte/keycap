@@ -6,8 +6,8 @@ stdenv.mkDerivation {
   src = ./www/keycap-client/.;
 
   yarnOfflineCache = fetchYarnDeps {
-    yarnLock = ./front/yarn.lock;
-    # hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    yarnLock = ./www/keycap-client/yarn.lock;
+    hash = "sha256-eAvWa+v+GLvUg5KvGSkUSK861QGokkj8BhLg2h887Ds=";
   };
 
   nativeBuildInputs = [

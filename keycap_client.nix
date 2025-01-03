@@ -16,4 +16,9 @@ stdenv.mkDerivation {
     yarnBuildHook
     nodejs
   ];
+
+  installPhase = ''
+    mkdir -p $out/keycap-client
+    mv build/* $out/keycap-client/
+  '';
 }

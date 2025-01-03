@@ -24,15 +24,16 @@ async fn main() {
 
     let binary_path = std::env::current_exe().unwrap();
     let store_path = binary_path.parent().unwrap().parent().unwrap();
+    let client_path = store_path.join("keycap-client");
+    println!("binary path: {}", binary_path.display());
     println!("store path: {}", store_path.display());
+    println!("client path: {}", client_path.display());
+    assert!(binary_path.exists());
     assert!(store_path.exists());
-    assert!(PathBuf::from(format!("{}/www/keycap-client/build", store_path.display())).exists());
+    assert!(client_path.exists());
 
     // HEY! keep in mind that warp::path("hoge").and(warp::fs::dir("somewhere/something")) WON'T WORK!
-    let front = warp::fs::dir(format!(
-        "{}/www/keycap-client/build",
-        binary_path.parent().unwrap().parent().unwrap().display()
-    ));
+    let front = warp::fs::dir(client_path);
 
     let version = warp::path("version").and_then(|| async {
         Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(Response::new(

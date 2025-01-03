@@ -8,6 +8,7 @@ use keycap::MisskeyApi;
 
 #[tokio::main]
 async fn main() {
+    println!("keycap server starting...");
     ever!();
     let matches = Command::new("keycap")
         .version(ever::build_commit_hash!())
@@ -221,4 +222,5 @@ async fn main() {
     };
     let socket_address = SocketAddrV4::new([0, 0, 0, 0].into(), port_to_listen.try_into().unwrap());
     warp::serve(front.or(api)).run(socket_address).await;
+    println!("keycap server started on port {}", port_to_listen);
 }

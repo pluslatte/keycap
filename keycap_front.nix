@@ -4,7 +4,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "keycap-client";
   version = "0.1.0";
 
-  src = ./lib/keycap-client/.;
+  src = ./www/keycap-client/.;
 
   nativeBuildInputs = [
     yarn-berry
@@ -78,9 +78,9 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   installPhase = ''
     runHook preInstall
 
-    mkdir -p $out/lib/keycap-client
+    mkdir -p $out/www/keycap-client
 
-    cp -r build $out/lib/keycap-client/build
+    cp -r build $out/www/keycap-client/build
 
     runHook postInstall
   '';

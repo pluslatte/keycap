@@ -1,4 +1,4 @@
-use std::{collections::HashMap, net::SocketAddrV4};
+use std::{collections::HashMap, net::SocketAddrV4, path::PathBuf};
 
 use clap::{builder::RangedU64ValueParser, Arg, Command};
 use ever::ever;
@@ -21,8 +21,18 @@ async fn main() {
                 .value_parser(RangedU64ValueParser::<u64>::new().range(1..=65535)),
         )
         .get_matches();
+
+    let binary_path = std::env::current_exe().unwrap();
+    let store_path = binary_path.parent().unwrap().parent().unwrap();
+    println!("store path: {}", store_path.display());
+    assert!(store_path.exists());
+    assert!(PathBuf::from(format!("{}/www/keycap-client/build", store_path.display())).exists());
+
     // HEY! keep in mind that warp::path("hoge").and(warp::fs::dir("somewhere/something")) WON'T WORK!
-    let front = warp::fs::dir("/www/keycap-client/build");
+    let front = warp::fs::dir(format!(
+        "{}/www/keycap-client/build",
+        binary_path.parent().unwrap().parent().unwrap().display()
+    ));
 
     let version = warp::path("version").and_then(|| async {
         Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(Response::new(

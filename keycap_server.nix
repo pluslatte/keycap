@@ -10,7 +10,7 @@ rustPlatform.buildRustPackage {
   pname = "keycap";
   version = "0.1.0";
 
-  buildInputs = [ openssl (pkgs.callPackage ./keycap_front.nix { }) ];
+  buildInputs = [ openssl (pkgs.callPackage ./keycap_client.nix { }) ];
   nativeBuildInputs = [ pkg-config ];
 
   postFixup = ''

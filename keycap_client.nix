@@ -78,9 +78,9 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   installPhase = ''
     runHook preInstall
 
-    mkdir -p $out/www/keycap-client
+    mkdir -p $out/www/keycap-client/
 
-    cp -r build $out/www/keycap-client/build
+    cp -r build $out/www/keycap-client/
 
     runHook postInstall
   '';

@@ -8,6 +8,7 @@ use keycap::MisskeyApi;
 
 #[tokio::main]
 async fn main() {
+    println!("keycap server starting...");
     ever!();
     let matches = Command::new("keycap")
         .version(ever::build_commit_hash!())
@@ -21,7 +22,7 @@ async fn main() {
         )
         .get_matches();
     // HEY! keep in mind that warp::path("hoge").and(warp::fs::dir("somewhere/something")) WON'T WORK!
-    let front = warp::fs::dir("front/build");
+    let front = warp::fs::dir("/lib/keycap-client/build");
 
     let version = warp::path("version").and_then(|| async {
         Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(Response::new(
@@ -220,5 +221,6 @@ async fn main() {
         None => 3030,
     };
     let socket_address = SocketAddrV4::new([0, 0, 0, 0].into(), port_to_listen.try_into().unwrap());
+    println!("keycap server started. listening on: {}", socket_address);
     warp::serve(front.or(api)).run(socket_address).await;
 }

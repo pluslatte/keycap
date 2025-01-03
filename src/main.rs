@@ -221,6 +221,6 @@ async fn main() {
         None => 3030,
     };
     let socket_address = SocketAddrV4::new([0, 0, 0, 0].into(), port_to_listen.try_into().unwrap());
+    println!("keycap server started. listening on: {}", socket_address);
     warp::serve(front.or(api)).run(socket_address).await;
-    println!("keycap server started on port {}", port_to_listen);
 }

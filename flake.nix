@@ -31,7 +31,7 @@
           ];
         };
 
-        packages.default = pkgs.callPackage ./keycap_server.nix { };
+        packages.default = pkgs.callPackage ./keycap_front.nix { };
       }
     );
 }

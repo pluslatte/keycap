@@ -12,8 +12,8 @@ stdenv.mkDerivation {
 
   nativeBuildInputs = [
     yarnConfigHook
-    yarnBuildHook
     yarnInstallHook
+    yarnBuildHook
     nodejs
   ];
 }

@@ -14,8 +14,8 @@ rustPlatform.buildRustPackage {
   nativeBuildInputs = [ pkg-config ];
 
   postFixup = ''
-    mkdir -p $out/www/keycap-client
-    cp -r www/keycap-client/build $out/www/keycap-client
+    mkdir -p $out/keycap-client
+    cp -r keycap-client/build $out/keycap-client
   '';
 
   src = ./.;

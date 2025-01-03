@@ -3,10 +3,10 @@ stdenv.mkDerivation {
   pname = "keycap-client";
   version = "0.1.0";
 
-  src = ./www/keycap-client/.;
+  src = ./keycap-client/.;
 
   yarnOfflineCache = fetchYarnDeps {
-    yarnLock = ./www/keycap-client/yarn.lock;
+    yarnLock = ./keycap-client/yarn.lock;
     hash = "sha256-eAvWa+v+GLvUg5KvGSkUSK861QGokkj8BhLg2h887Ds=";
   };
 

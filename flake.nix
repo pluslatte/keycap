@@ -31,7 +31,15 @@
           ];
         };
 
-        packages.default = pkgs.callPackage ./keycap_front.nix { };
+        packages = {
+          default = pkgs.symlinkJoin {
+            name = "keycap";
+            paths = [
+              (pkgs.callPackage ./keycap_server.nix { })
+              (pkgs.callPackage ./keycap_front.nix { })
+            ];
+          };
+        };
       }
     );
 }

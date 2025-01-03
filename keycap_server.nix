@@ -8,12 +8,16 @@ let
 in
 rustPlatform.buildRustPackage
 {
-  pname = "keycap_server";
+  pname = "keycap";
   version = "0.1.0";
 
-  buildInputs = [ openssl ];
+  buildInputs = [ openssl (pkgs.callPackage ./keycap_client.nix { }) ];
   nativeBuildInputs = [ pkg-config ];
 
   src = ./.;
   cargoLock.lockFile = ./Cargo.lock;
+
+  postFixup = ''
+    cp -r keycap-client $out/
+  '';
 }

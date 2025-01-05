@@ -23,6 +23,7 @@
           inherit system;
           overlays = [ rust-overlay.overlays.default ];
         };
+        keycapClient = pkgs.callPackage ./keycap_client.nix { };
       in
       {
         devShells.default = pkgs.mkShell {
@@ -35,7 +36,10 @@
           ];
         };
 
-        packages.default = pkgs.callPackage ./keycap_server.nix { inherit self; };
+        packages.default = pkgs.callPackage ./keycap_server.nix {
+          inherit self;
+          inherit keycapClient;
+        };
       }
     );
 }

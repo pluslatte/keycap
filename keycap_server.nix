@@ -5,6 +5,7 @@
   rust-bin,
   openssl,
   pkg-config,
+  keycapClient,
 }:
 let
   toolchain = rust-bin.stable.latest.default;
@@ -14,16 +15,14 @@ let
     rustc = toolchain;
   };
 
-  keycapClient = pkgs.callPackage ./keycap_client.nix { };
-
-  cargoEnvValExport = if self ? rev then "export GIT_HASH=${self.rev}" else "export GIT_HASH=dirty";
+  cargoEnvValExport1 = if self ? rev then "export GIT_HASH=${self.rev}" else "export GIT_HASH=dirty";
+  cargoEnvValExport2 = "export CLIENT_PATH=${keycapClient.outPath}/keycap-client";
 in
 rustPlatform.buildRustPackage {
   name = "keycap";
 
   buildInputs = [
     openssl
-    keycapClient
   ];
   nativeBuildInputs = [
     pkg-config
@@ -34,11 +33,7 @@ rustPlatform.buildRustPackage {
   cargoLock.lockFile = ./Cargo.lock;
 
   preBuild = ''
-    ${cargoEnvValExport}
-  '';
-
-  preInstall = ''
-    mkdir -p $out
-    cp -r ${keycapClient.outPath}/keycap-client $out/
+    ${cargoEnvValExport1}
+    ${cargoEnvValExport2}
   '';
 }

@@ -4,6 +4,11 @@ fn main() {
     if git_hash.map(|g| !g.is_empty()) == Ok(true) {
         return;
     }
+    let client_path = env::var("CLIENT_PATH");
+    if client_path.map(|g| !g.is_empty()) == Ok(true) {
+    } else {
+        println!("cargo:rustc-env=CLIENT_PATH=none",);
+    }
 
     let out = Command::new("git")
         .args(["rev-parse", "HEAD"])

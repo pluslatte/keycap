@@ -1,4 +1,4 @@
-use std::{collections::HashMap, net::SocketAddrV4};
+use std::{collections::HashMap, net::SocketAddrV4, path::PathBuf, str::FromStr};
 
 use clap::{builder::RangedU64ValueParser, Arg, Command};
 use warp::{reply::Response, Filter};
@@ -8,6 +8,7 @@ use keycap::MisskeyApi;
 #[tokio::main]
 async fn main() {
     const GIT_COMMIT_HASH: &str = env!("GIT_HASH");
+    const CLIENT_PATH: &str = env!("CLIENT_PATH");
     let matches = Command::new("keycap")
         .version(GIT_COMMIT_HASH)
         .about("Server program which provides an alternative, light-weight web client for Misskey.")
@@ -20,17 +21,12 @@ async fn main() {
         )
         .get_matches();
 
-    let binary_path = std::env::current_exe().unwrap();
-    let store_path = binary_path.parent().unwrap().parent().unwrap();
-    let client_path = store_path.join("keycap-client");
-    println!("binary path: {}", binary_path.display());
-    assert!(binary_path.exists());
-    println!("confirmed");
-    println!("store path: {}", store_path.display());
-    assert!(store_path.exists());
-    println!("confirmed");
+    let client_path = PathBuf::from_str(CLIENT_PATH).unwrap();
     println!("client path: {}", client_path.display());
-    assert!(client_path.exists());
+    assert!(
+        client_path.exists(),
+        "Invalid client path (which should be embedded on build)"
+    );
     println!("confirmed");
 
     println!("starting keycap server...");

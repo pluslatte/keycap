@@ -8,30 +8,24 @@
     };
   };
 
-  outputs =
-    { nixpkgs
-    , flake-utils
-    , rust-overlay
-    , ...
-    }:
-    flake-utils.lib.eachDefaultSystem (
-      system:
+  outputs = { nixpkgs, flake-utils, rust-overlay, ... }:
+    flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs {
           inherit system;
           overlays = [ rust-overlay.overlays.default ];
         };
-      in
-      {
+      in {
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
             openssl
             pkg-config
+            nodejs
+            yarn
             rust-bin.stable.latest.default
           ];
         };
 
         packages.default = pkgs.callPackage ./keycap_server.nix { };
-      }
-    );
+      });
 }

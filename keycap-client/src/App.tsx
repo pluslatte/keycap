@@ -32,13 +32,13 @@ function App() {
     }).then((response) => {
       if (!response.ok) {
         console.error(response);
-        // throw new Error("status is not 200");
+        throw new Error("status is not 200");
       }
       return response.text();
     });
   const [versionData] = useState(() => new Loadable(fetchVersion()));
 
-  const onNoteInputFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onNoteInputFieldChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = event.target.value;
     setNoteText(value);
   };
@@ -163,8 +163,7 @@ function App() {
       <div>
         <p>{username}@{serverDomain}</p>
         <div>
-          <input
-            type="text"
+          <textarea
             value={noteText}
             onChange={onNoteInputFieldChange}
             placeholder="Type something..."

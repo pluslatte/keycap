@@ -11,7 +11,7 @@ in rustPlatform.buildRustPackage {
   version = "0.1.0";
 
   buildInputs = [ openssl keycapClient ];
-  nativeBuildInputs = [ pkg-config pkgs.git ];
+  nativeBuildInputs = [ pkg-config ];
 
   src = ./.;
   cargoLock.lockFile = ./Cargo.lock;

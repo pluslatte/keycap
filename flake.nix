@@ -8,7 +8,7 @@
     };
   };
 
-  outputs = { nixpkgs, flake-utils, rust-overlay, ... }:
+  outputs = { self, nixpkgs, flake-utils, rust-overlay, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs {
@@ -26,6 +26,7 @@
           ];
         };
 
-        packages.default = pkgs.callPackage ./keycap_server.nix { };
+        packages.default =
+          pkgs.callPackage ./keycap_server.nix { inherit self; };
       });
 }

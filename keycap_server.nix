@@ -7,8 +7,7 @@ let
   };
   keycapClient = pkgs.callPackage ./keycap_client.nix { };
 in rustPlatform.buildRustPackage {
-  pname = "keycap";
-  version = "0.1.0";
+  name = "keycap";
 
   buildInputs = [ openssl keycapClient ];
   nativeBuildInputs = [ pkg-config ];

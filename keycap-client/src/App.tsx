@@ -20,7 +20,7 @@ function App() {
     return (
       <div>
         <p>
-          Version: {value}
+          Git hash: {value}
         </p>
       </div>
     );

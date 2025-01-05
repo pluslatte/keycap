@@ -18,7 +18,7 @@
       in {
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
-            openssl
+            openssl.dev
             pkg-config
             nodejs
             yarn

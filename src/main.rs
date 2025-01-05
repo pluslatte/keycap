@@ -1,17 +1,15 @@
-use std::{collections::HashMap, net::SocketAddrV4, path::PathBuf};
+use std::{collections::HashMap, net::SocketAddrV4};
 
 use clap::{builder::RangedU64ValueParser, Arg, Command};
-use ever::ever;
 use warp::{reply::Response, Filter};
 
 use keycap::MisskeyApi;
 
 #[tokio::main]
 async fn main() {
-    println!("keycap server starting...");
-    ever!();
+    const GIT_COMMIT_HASH: &str = env!("GIT_HASH");
     let matches = Command::new("keycap")
-        .version(ever::build_commit_hash!())
+        .version(GIT_COMMIT_HASH)
         .about("Server program which provides an alternative, light-weight web client for Misskey.")
         .arg(
             Arg::new("port")
@@ -26,18 +24,22 @@ async fn main() {
     let store_path = binary_path.parent().unwrap().parent().unwrap();
     let client_path = store_path.join("keycap-client");
     println!("binary path: {}", binary_path.display());
-    println!("store path: {}", store_path.display());
-    println!("client path: {}", client_path.display());
     assert!(binary_path.exists());
+    println!("confirmed");
+    println!("store path: {}", store_path.display());
     assert!(store_path.exists());
+    println!("confirmed");
+    println!("client path: {}", client_path.display());
     assert!(client_path.exists());
+    println!("confirmed");
 
+    println!("starting keycap server...");
     // HEY! keep in mind that warp::path("hoge").and(warp::fs::dir("somewhere/something")) WON'T WORK!
     let front = warp::fs::dir(client_path);
 
-    let version = warp::path("version").and_then(|| async {
+    let version = warp::path("version").and_then(|| async move {
         Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(Response::new(
-            ever::build_commit_hash!().into(),
+            GIT_COMMIT_HASH.into(),
         ))
     });
 
@@ -232,6 +234,6 @@ async fn main() {
         None => 3030,
     };
     let socket_address = SocketAddrV4::new([0, 0, 0, 0].into(), port_to_listen.try_into().unwrap());
-    println!("keycap server started. listening on: {}", socket_address);
+    println!("started. listening on: {}", socket_address);
     warp::serve(front.or(api)).run(socket_address).await;
 }

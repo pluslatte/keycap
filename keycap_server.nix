@@ -6,14 +6,12 @@ let
     rustc = toolchain;
   };
   keycapClient = pkgs.callPackage ./keycap_client.nix { };
-in
-rustPlatform.buildRustPackage
-{
+in rustPlatform.buildRustPackage {
   pname = "keycap";
   version = "0.1.0";
 
   buildInputs = [ openssl keycapClient ];
-  nativeBuildInputs = [ pkg-config ];
+  nativeBuildInputs = [ pkg-config pkgs.git ];
 
   src = ./.;
   cargoLock.lockFile = ./Cargo.lock;

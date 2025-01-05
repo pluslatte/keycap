@@ -24,10 +24,7 @@ rustPlatform.buildRustPackage {
   buildInputs = [
     openssl
   ];
-  nativeBuildInputs = [
-    pkg-config
-    pkgs.git
-  ];
+  nativeBuildInputs = [ pkg-config ];
 
   src = ./.;
   cargoLock.lockFile = ./Cargo.lock;

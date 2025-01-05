@@ -37,28 +37,8 @@ rustPlatform.buildRustPackage {
     ${cargoEnvValExport}
   '';
 
-  # buildPhase = ''
-  #   ${cargoEnvValExport}
-  #   cargo build --release
-  # '';
-
   preInstall = ''
-    echo "preInstall"
     mkdir -p $out
     cp -r ${keycapClient.outPath}/keycap-client $out/
   '';
-
-  # postBuild = ''
-  # '';
-  # postInstall = ''
-  # '';
-  # postFixup = ''
-  # '';
-  # postConfigure = ''
-  # '';
-
-  # preFixup = ''
-  # '';
-  # preConfigure = ''
-  # '';
 }

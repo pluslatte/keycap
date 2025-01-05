@@ -1,4 +1,5 @@
 {
+  lib,
   stdenv,
   fetchYarnDeps,
   yarnConfigHook,
@@ -9,7 +10,7 @@
 stdenv.mkDerivation {
   name = "keycap-client";
 
-  src = ./keycap-client;
+  src = lib.cleanSource ./keycap-client;
 
   yarnOfflineCache = fetchYarnDeps {
     yarnLock = ./keycap-client/yarn.lock;

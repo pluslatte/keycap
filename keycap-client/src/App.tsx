@@ -32,7 +32,7 @@ function App() {
     }).then((response) => {
       if (!response.ok) {
         console.error(response);
-        throw new Error("status is not 200");
+        // throw new Error("status is not 200");
       }
       return response.text();
     });

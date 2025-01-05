@@ -10,7 +10,7 @@ in rustPlatform.buildRustPackage {
   name = "keycap";
 
   buildInputs = [ openssl keycapClient ];
-  nativeBuildInputs = [ pkg-config ];
+  nativeBuildInputs = [ pkg-config pkgs.git ];
 
   src = ./.;
   cargoLock.lockFile = ./Cargo.lock;

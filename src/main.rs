@@ -1,14 +1,15 @@
 use std::{collections::HashMap, net::SocketAddrV4};
 
-use clap::{builder::RangedU64ValueParser, crate_version, Arg, Command};
+use clap::{builder::RangedU64ValueParser, Arg, Command};
 use warp::{reply::Response, Filter};
 
 use keycap::MisskeyApi;
 
 #[tokio::main]
 async fn main() {
+    const GIT_COMMIT_HASH: &str = env!("GIT_HASH");
     let matches = Command::new("keycap")
-        .version(crate_version!())
+        .version(GIT_COMMIT_HASH)
         .about("Server program which provides an alternative, light-weight web client for Misskey.")
         .arg(
             Arg::new("port")
@@ -38,7 +39,7 @@ async fn main() {
 
     let version = warp::path("version").and_then(|| async move {
         Ok::<warp::http::Response<warp::hyper::Body>, warp::Rejection>(Response::new(
-            crate_version!().into(),
+            GIT_COMMIT_HASH.into(),
         ))
     });
 

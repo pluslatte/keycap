@@ -12,7 +12,7 @@ stdenv.mkDerivation {
 
   nativeBuildInputs = [ yarnConfigHook yarnInstallHook yarnBuildHook nodejs ];
 
-  installPhase = ''
+  postInstall = ''
     mkdir -p $out/keycap-client
     mv build/* $out/keycap-client/
   '';

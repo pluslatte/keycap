@@ -1,11 +1,14 @@
 { self, pkgs, makeRustPlatform, rust-bin, openssl, pkg-config, }:
 let
   toolchain = rust-bin.stable.latest.default;
+
   rustPlatform = makeRustPlatform {
     cargo = toolchain;
     rustc = toolchain;
   };
+
   keycapClient = pkgs.callPackage ./keycap_client.nix { };
+
   cargoEnvValExport = if self ? rev then
     "export GIT_HASH=${self.rev}"
   else
